@@ -482,6 +482,8 @@ function sync_sendmail($userlist, $syncFail) {
     GLOBAL $CFG, $USER, $DB;
     $userfrom = core_user::get_noreply_user();
     $userfrom->maildisplay = true;
+	
+	foreach ($userlist as $user){
     $eventdata = new \core\message\message();
 
     //subject
@@ -504,7 +506,6 @@ function sync_sendmail($userlist, $syncFail) {
         */
     $messagetext = "";
 
-    foreach ($userlist as $user){
         $eventdata->component = "local_sync"; // your component name
         $eventdata->name = "sync_notification"; // this is the message name from messages.php
         $eventdata->userfrom = $userfrom;

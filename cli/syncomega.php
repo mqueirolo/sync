@@ -150,21 +150,26 @@ if($academicids) {
 
 }
 
-// Add Script to get list o users who will receive the mail
-$mails = explode("," ,$CFG->sync_mailalert);
-$userlist = array();
-foreach ($mails as $mail){
+//print_r($syncFail);
+if (count($syncFail) > 0) {
+	
+	// Add Script to get list o users who will receive the mail
+	$mails = explode("," ,$CFG->sync_mailalert);
+	$userlist = array();
+	foreach ($mails as $mail){
     //echo "var dump mail\n";
     //echo "\n\n\n\n\n\n";
     $sqlmail = "Select id From {user} where username = ?";
     $usercfg = $DB->get_records_sql($sqlmail,array($mail));
     foreach ($usercfg as $user){
+			//echo "UsuarioId: {$user->id}\n\n";
         array_push($userlist, $user->id);
     }
+	}
+	
+	mtrace("Enviando correos de error a usuarios");
+	sync_sendmail($userlist, $syncFail);
 }
-
-//print_r($syncFail);
-/*if (count($syncFail) > 0)*/ sync_sendmail($userlist, $syncFail);
 
 // exec("/Applications/MAMP/bin/php/php7.0.0/bin/php /Applications/MAMP/htdocs/moodle/enrol/database/cli/sync.php");
 // exec("/usr/bin/php /Datos/moodle/moodle/enrol/database/cli/sync.php");
