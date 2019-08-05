@@ -121,7 +121,7 @@ if($academicids) {
 		$insert->countenrols = $rowinfo["enrol"];
 	
 		$historyrecords[] = $insert;
-		/*if ($insert->countcourses == 0 || $insert->countenrols == 0)*/ array_push($syncFail,array($academic, $rowinfo["course"], $rowinfo["enrol"]));
+		if ($insert->countcourses == 0 || $insert->countenrols == 0) array_push($syncFail,array($academic, $rowinfo["course"], $rowinfo["enrol"]));
 
 		mtrace("Academic Period ".$academic.", Total courses ".$rowinfo["course"].", Total enrol ".$rowinfo["enrol"]."\n");
 	}
@@ -157,14 +157,14 @@ if (count($syncFail) > 0) {
 	$mails = explode("," ,$CFG->sync_mailalert);
 	$userlist = array();
 	foreach ($mails as $mail){
-    //echo "var dump mail\n";
-    //echo "\n\n\n\n\n\n";
-    $sqlmail = "Select id From {user} where username = ?";
-    $usercfg = $DB->get_records_sql($sqlmail,array($mail));
-    foreach ($usercfg as $user){
-			//echo "UsuarioId: {$user->id}\n\n";
-        array_push($userlist, $user->id);
-    }
+        //echo "var dump mail\n";
+        //echo "\n\n\n\n\n\n";
+        $sqlmail = "Select id From {user} where username = ?";
+        $usercfg = $DB->get_records_sql($sqlmail,array($mail));
+        foreach ($usercfg as $user){
+                //echo "UsuarioId: {$user->id}\n\n";
+            array_push($userlist, $user->id);
+        }
 	}
 	
 	mtrace("Enviando correos de error a usuarios");
