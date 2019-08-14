@@ -39,7 +39,7 @@ function sync_getusers_fromomega($academicids, $syncinfo, $options = null){
 			"PeriodosAcademicos" => array($academicids)
 	);
 
-    mtrace("\n\n## Obteniendo listado de cursos desde Omega {$url} ##\n");
+    mtrace("\n\n## Obteniendo listado de usuarios desde Omega {$url} ##\n");
     for ($i = 1; $i<=3; $i++){
 
         mtrace("Intento de comunicacion {$i}");
@@ -205,11 +205,11 @@ function sync_getcourses_fromomega($academicids, $syncinfo, $options = null){
 	return array($courses, $syncinfo);
 }
 
-function sync_getacademicperiod($academicPeriodId = 0){
+function sync_getacademicperiod($academicperiodid = 0){
 	global $DB;
 	
 	// Get all ID from each academic period with status is active (value 1)
-    if ($academicPeriodId > 0) $periods = $DB->get_records("sync_data", array("status" => SYNC_STATUS_ACTIVE, "academicperiodid" => $academicPeriodId));
+    if ($academicperiodid > 0) $periods = $DB->get_records("sync_data", array("status" => SYNC_STATUS_ACTIVE, "academicperiodid" => $academicperiodid));
     else $periods = $DB->get_records("sync_data", array("status" => SYNC_STATUS_ACTIVE));
 
 	mtrace("Academic Period to synchronize \n");
@@ -484,27 +484,26 @@ function sync_sendmail($userlist, $syncFail) {
     $userfrom->maildisplay = true;
 	
 	foreach ($userlist as $user){
-    $eventdata = new \core\message\message();
+        $eventdata = new \core\message\message();
 
-    //subject
-    $eventdata->subject = "Get academic period sync error";
-    $messagehtml = "<html>".
-        "<p>Estimado: usuario,</p>".
-        "<p>Se ha completado la tarea de sincronización: " . date('d/m/Y h:i:s a', time()). "</p>".
-        "#DATAHERE#".
-        "<p>Atentamente,</p>".
-        "<p>Equipo de WebCursos</p>".
-    "</html>";
+        //subject
+        $eventdata->subject = "Get academic period sync error";
+        $messagehtml = "<html>".
+            "<p>Estimado: usuario,</p>".
+            "<p>Se ha completado la tarea de sincronización: " . date('d/m/Y h:i:s a', time()). "</p>".
+            "#DATAHERE#".
+            "<p>Atentamente,</p>".
+            "<p>Equipo de WebCursos</p>".
+        "</html>";
 
-    $messagehtml = str_replace("#DATAHERE#", sync_htmldata($syncFail), $messagehtml);
+        $messagetext = "Estimado usuario,\n".
+            "Se ha completado la tarea de sincronización: ". date('d/m/Y h:i:s a', time()). "\n\n".
+            "#DATAHERE#\n\n".
+            "Atentamente,\n".
+            "Equipo de WebCursos\n";
 
-        /*
-        $messagetext = "Dear" ." ". $admin->firstname . " " . $admin->lastname . ",\n";
-        $messagetext .= "This automated mail regrets to inform you there was an error while performing the synchronization on: ". "\n";
-        $messagetext .= date('d/m/Y h:i:s a', time()). "\n";
-        $messagetext .= "We are sorry for the inconvenience.\n Sincerely, \n The WebCursos Team ". "\n";
-        */
-    $messagetext = "";
+        $messagehtml = str_replace("#DATAHERE#", sync_htmldata($syncFail), $messagehtml);
+        $messagetext = str_replace("#DATAHERE#", sync_htmldata($syncFail), $messagetext);
 
         $eventdata->component = "local_sync"; // your component name
         $eventdata->name = "sync_notification"; // this is the message name from messages.php
